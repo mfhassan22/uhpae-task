@@ -1,0 +1,108 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js"></script>
+<script>
+    let selectedid = 0;
+    const getTable = () => {
+        $.ajax({
+            type: "GET",
+            url: "/api/users/",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                var trHTML = '';
+                $.each(data, function (i, item) {
+                    trHTML += '<tr><td>' + item.id + '</td><td>' + item.user + '</td><td>' + item.number + '</td><td>';
+                    trHTML += '<button onclick="' + 'edit(' + item.id + ',\'' + item.user + '\',\'' + item.number + '\')" > Edit</button > ' + '</td ></tr > ';
+                });
+                $('#table1').html(trHTML);
+                return;
+            },
+            error: function (errMsg) {
+                alert(errMsg);
+            }
+        });
+    }
+    const edit = (id, user, number) => {
+        $('#user').val(user);
+        $('#number').val(number);
+        selectedid = id;
+    }
+    const save = () => {
+        user = $('#user').val();
+        number = $('#number').val();
+
+        $.ajax({
+            type: "POST",
+            url: "/api/users/",
+            // The key needs to match your method's input parameter (case-sensitive).
+            data: JSON.stringify({ 'user': user, 'number': number }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                $('#msg').html('User Added');
+                getTable();
+            },
+            error: function (errMsg) {
+                alert(errMsg);
+            }
+        });
+    }
+    const update = () => {
+        user = $('#user').val();
+        number = $('#number').val();
+
+        $.ajax({
+            type: "POST",
+            url: "/api/users/" + selectedid,
+            // The key needs to match your method's input parameter (case-sensitive).
+            data: JSON.stringify({ 'user': user, 'number': number }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                $('#msg').html('User Updated');
+                getTable();
+            },
+            error: function (errMsg) {
+                alert(errMsg);
+            }
+        });
+    }
+    $(document).ready(function () {
+        getTable();
+    });
+</script>
+<div id="app" class="container">
+    <div class="row" style="display:flex;justify-content:center;">
+        <h6 style="color:green;" id="msg"></h6>
+    </div>
+    <div class="row">
+        <div class="column">
+            <label for="nameField">User</label>
+            <input type="text" placeholder="User" id="user">
+        </div>
+        <div class="column">
+            <label for="nameField">Number</label>
+            <input type="text" placeholder="User" id="number">
+        </div>
+        <div class="column" style="display: flex; justify-content:left;align-items:end;">
+            <button id="btn_save" class="button button-outline button-black" onclick="save()">Save</button>
+            <button id="btn_save" class="button button-outline button-red" onclick="update()">Update</button>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>User</th>
+                <th>Number</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="table1">
+
+        </tbody>
+    </table>
+
+</div>
